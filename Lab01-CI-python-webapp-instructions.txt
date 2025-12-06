@@ -1,0 +1,73 @@
+Lab: Lab01-CI-python-webapp
+=============================
+
+Setup:
+
+- You must create a new GitHub public Repository to pull the application code, configuration files
+   and scripts needed by CodeBuild. You can copy all the files in the lab directory into your new GH repository.
+   - can get files from my temporary HG repo: https://github.com/mvpjava/demotime.git
+   
+   
+- Create an S3 bucket that contains the name "codebuild" and create 2 folders in it
+     - name first folder "output-artifact"
+     - name second folder "build-cache"
+
+
+  
+1 - Goto AWS CodeBuild Web Console
+2 - Create a new CodeBuild Project by clicking on button "Create project"
+    -  give project a name
+	- Section: "Source"
+	  - Source Provider: GitHub
+	  - Select option: Public repository
+	    - Enter your public repository URL
+		
+		
+    - Section: Primary source webhook events Info
+	    - Environment image: Leave it as "Managed image"
+		- Running mode: Leave it as "Container"
+		- Operating System: Select "Amazon Linux"
+		- Service role: leave its as "New service role"
+		  - Role name: can leave it as the auto-generated name
+		- Expand the "Addition configuration" arrow
+		  - Under "Compute" section  (scroll down to see)
+		    - Select option: 2 vCPUs, 4 GiB memory
+			
+	- Section: Buildspec
+	  - Select option "Use a buildspec file"  (The buildspec.yml file is in your new GH repo)
+	  
+	- Section: Artifacts
+	  - Select Type: S3
+	  - Search and select the S3 bucket name you created earlier in Setup step
+	  - Name: Enter the name of the zip file (i.e: test-python-codebuild-artifact.zip)
+	  - Path: enter your folder name that you setup in the Setup step: "output-artifact"
+	  - Artifacts packaging: Select Zip
+	  - Select checkbox "Disable artifact encryption"
+	  - Expand arrow "Additional configuration"
+	    - Cache Type: Select "Amazon S3"
+          - Cache bucket: Search and select the S3 bucket name you created earlier in Setup step
+	      - Cache path prefix: enter your second folder name that you setup in the Setup step: "build-cache"
+
+
+	- Section: Logs
+      - Leave as is, do not change anytghing
+	  
+- Press button "Create build project" (wait a minute)
+
+- Start the build manually by clicking button "Start build"
+  - Check the logs on the console
+    - Is CodeBuild using the S3 cache?
+	- Did the Tests pass?
+	- Where was the built artifact saved to?
+	  - Download it and see what is inside.
+	- Confirm all build pahses succeeded
+	
+	
+- Make a git commit on your GitHub repo to kick-off the build automatically
+  i.e: Change line in app.py
+       (look for line:   <h1>Python Hello World ... Version 1.0!</h1> )
+	   and change to Version: 1.1
+
+- Did the build execute automatically? If so, why?
+- Did the second build use the S3 Cache this time? 
+  - Was the build a bit faster, more secure?
